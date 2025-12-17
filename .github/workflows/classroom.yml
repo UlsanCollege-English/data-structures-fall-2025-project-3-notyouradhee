@@ -1,7 +1,7 @@
 name: Autograding Tests
-on:
-  push:
-  repository_dispatch:
+'on':
+- push
+- repository_dispatch
 permissions:
   checks: write
   actions: read
@@ -13,16 +13,15 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - name: tests
+      id: tests
+      uses: classroom-resources/autograding-python-grader@v1
       with:
-        python-version: "3.11"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pytest
-    - name: Run pytest
+        timeout: 10
+        setup-command: ''
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
       env:
-        PYTHONPATH: src
-      run: |
-        pytest -v --tb=short
+        TESTS_RESULTS: "${{steps.tests.outputs.result}}"
+      with:
+        runners: tests
